@@ -1,11 +1,17 @@
 #ifndef WORLD_SPACE_
 #define WORLD_SPACE_
 
+#include "glm/vec3.hpp"
+
 #include <array>
+#include <vector>
 
-const int WIDTH = 100, HEIGHT = 100, DEPTH = 100;
+const int WIDTH = 10, HEIGHT = 10, DEPTH = 10;
 
-typedef std::array<std::array<std::array<float, DEPTH>, HEIGHT>, WIDTH> WorldDensity;
+struct Cube
+{
+    glm::vec3 v0, v1, v2, v3, v4, v5, v6, v7;
+};
 
 class WorldSpace
 {
@@ -14,9 +20,10 @@ public:
     ~WorldSpace() = default;
 
     void Generate();
+    std::vector<Cube> GetCubes();
 
 private:
-    WorldDensity m_world_density;
+    std::vector<Cube> m_cubes;
 };
 
 #endif // WORLD_SPACE_

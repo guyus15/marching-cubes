@@ -2,8 +2,11 @@
 
 int main()
 {
-    Application application;
-    application.Run();
+    Application* application = new Application();
+
+    application->Run();
+
+    delete application;
 
     return 0;
 }
