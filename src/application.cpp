@@ -73,51 +73,65 @@ void Application::Run()
 
     for (const auto& cube : cubes)
     {
-        vertices[current_vertex++] = cube.v0.x;
-        vertices[current_vertex++] = cube.v0.y;
-        vertices[current_vertex++] = cube.v0.z;
-            
-        vertices[current_vertex++] = cube.v1.x;
-        vertices[current_vertex++] = cube.v1.y;
-        vertices[current_vertex++] = cube.v1.z;
+        vertices[current_vertex++] = cube.vertices[0].x;
+        vertices[current_vertex++] = cube.vertices[0].y;
+        vertices[current_vertex++] = cube.vertices[0].z;
 
-        vertices[current_vertex++] = cube.v2.x;
-        vertices[current_vertex++] = cube.v2.y;
-        vertices[current_vertex++] = cube.v2.z;
+        vertices[current_vertex++] = cube.vertices[1].x;
+        vertices[current_vertex++] = cube.vertices[1].y;
+        vertices[current_vertex++] = cube.vertices[1].z;
 
-        vertices[current_vertex++] = cube.v3.x;
-        vertices[current_vertex++] = cube.v3.y;
-        vertices[current_vertex++] = cube.v3.z;
+        vertices[current_vertex++] = cube.vertices[2].x;
+        vertices[current_vertex++] = cube.vertices[2].y;
+        vertices[current_vertex++] = cube.vertices[2].z;
 
-        vertices[current_vertex++] = cube.v4.x;
-        vertices[current_vertex++] = cube.v4.y;
-        vertices[current_vertex++] = cube.v4.z;
+        vertices[current_vertex++] = cube.vertices[3].x;
+        vertices[current_vertex++] = cube.vertices[3].y;
+        vertices[current_vertex++] = cube.vertices[3].z;
 
-        vertices[current_vertex++] = cube.v5.x;
-        vertices[current_vertex++] = cube.v5.y;
-        vertices[current_vertex++] = cube.v5.z;
+        vertices[current_vertex++] = cube.vertices[4].x;
+        vertices[current_vertex++] = cube.vertices[4].y;
+        vertices[current_vertex++] = cube.vertices[4].z;
 
-        vertices[current_vertex++] = cube.v6.x;
-        vertices[current_vertex++] = cube.v6.y;
-        vertices[current_vertex++] = cube.v6.z;
+        vertices[current_vertex++] = cube.vertices[5].x;
+        vertices[current_vertex++] = cube.vertices[5].y;
+        vertices[current_vertex++] = cube.vertices[5].z;
 
-        vertices[current_vertex++] = cube.v7.x;
-        vertices[current_vertex++] = cube.v7.y;
-        vertices[current_vertex++] = cube.v7.z;
+        vertices[current_vertex++] = cube.vertices[6].x;
+        vertices[current_vertex++] = cube.vertices[6].y;
+        vertices[current_vertex++] = cube.vertices[6].z;
+
+        vertices[current_vertex++] = cube.vertices[7].x;
+        vertices[current_vertex++] = cube.vertices[7].y;
+        vertices[current_vertex++] = cube.vertices[7].z;
     }
+
+    // Set up polygon vertices with some method. And load them into a separate vertex buffer with a
+    // different vertex array object.
+    std::vector<float> polygon_vertices = m_world_space.CreateTriangles();
 
     // TODO: now vertices are loaded into buffer. We can send them off to the shader
     // to be drawn!
     
-    unsigned int VAO, VBO;
+    unsigned int VAOs[2], VBOs[2];
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    glGenVertexArrays(2, VAOs);
+    glGenBuffers(2, VBOs);
 
-    glBindVertexArray(VAO);
+    // Grid buffer
+    glBindVertexArray(VAOs[0]);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+
+    // Polygon buffer
+    glBindVertexArray(VAOs[1]);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+    glBufferData(GL_ARRAY_BUFFER, polygon_vertices.size() * sizeof(float), &polygon_vertices[0], GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
@@ -140,12 +154,11 @@ void Application::Run()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         
         model = glm::mat4{ 1.0f };
-        model = glm::translate(model, glm::vec3{ 0.0f, -0.5f, 0.0f });
         model = glm::rotate(model, glm::radians((float)glfwGetTime() * 10.0f), glm::vec3{ 0.0f, 1.0f, 0.0f });
         model = glm::scale(model, glm::vec3{ 0.1f, 0.1f, 0.1f });
 
         view = glm::mat4{ 1.0f };
-        view = glm::translate(view, glm::vec3{ 0.0f, 0.0f, -3.0f });
+        view = glm::translate(view, glm::vec3{ 0.0f, 0.0f, -0.5f });
 
         float aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
@@ -156,8 +169,14 @@ void Application::Run()
         world_shader.set_mat4("view", view);
         world_shader.set_mat4("projection", projection);
 
-        glBindVertexArray(VAO);
+        glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_POINTS, 0, WIDTH * HEIGHT * DEPTH * 8);
+
+        glBindVertexArray(VAOs[1]);
+        glDrawArrays(GL_TRIANGLES, 0, polygon_vertices.size() / 3);
+
+        // Unbind
+        glBindVertexArray(0);
 
         glfwSwapBuffers(m_window);
         glfwPollEvents();
