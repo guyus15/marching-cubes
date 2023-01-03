@@ -6,11 +6,12 @@
 #include <array>
 #include <vector>
 
-const int WIDTH = 1, HEIGHT = 1, DEPTH = 1;
+const int WIDTH = 10, HEIGHT = 10, DEPTH = 10;
 
 struct Cube
 {
     glm::vec3 vertices[8];
+    float densities[8];
 };
 
 class WorldSpace

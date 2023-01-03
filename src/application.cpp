@@ -154,11 +154,11 @@ void Application::Run()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         
         model = glm::mat4{ 1.0f };
-        model = glm::rotate(model, glm::radians((float)glfwGetTime() * 10.0f), glm::vec3{ 0.0f, 1.0f, 0.0f });
+        //model = glm::rotate(model, glm::radians((float)glfwGetTime() * 10.0f), glm::vec3{ 0.0f, 1.0f, 0.0f });
         model = glm::scale(model, glm::vec3{ 0.1f, 0.1f, 0.1f });
 
         view = glm::mat4{ 1.0f };
-        view = glm::translate(view, glm::vec3{ 0.0f, 0.0f, -0.5f });
+        view = glm::translate(view, glm::vec3{ -0.2f, -0.25f, -2.0f });
 
         float aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 
